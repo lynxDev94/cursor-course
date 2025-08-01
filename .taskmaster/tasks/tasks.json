@@ -81,21 +81,49 @@
         "dependencies": [
           2
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": []
       },
       {
         "id": 4,
         "title": "Integrate OpenAI Streaming API",
-        "description": "Implement the integration with OpenAI's streaming API for real-time text responses.",
-        "details": "Use server-sent events to connect to OpenAI's streaming API. Handle incoming data to display streaming text responses in the chat interface.",
-        "testStrategy": "Test the streaming functionality by sending messages and verifying real-time response display.",
-        "priority": "high",
+        "description": "Enhance the existing OpenAI integration by adding streaming functionality for real-time word-by-word text responses.",
+        "status": "pending",
         "dependencies": [
           3
         ],
-        "status": "pending",
-        "subtasks": []
+        "priority": "high",
+        "details": "Build upon the existing OpenAI API integration via Supabase Edge Functions by implementing server-sent events to support streaming responses. Ensure that incoming data is handled to display streaming text responses in the chat interface. Maintain conversation context management with an 8-message history and integrate with the existing Next.js API route for proxying requests.",
+        "testStrategy": "Test the streaming functionality by sending messages and verifying real-time word-by-word response display. Ensure that the frontend correctly handles loading states and transitions smoothly to displaying streaming text.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement server-sent events for streaming",
+            "description": "Set up server-sent events to enable streaming responses from the OpenAI API.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Integrate streaming responses into chat interface",
+            "description": "Modify the chat interface to handle and display streaming text responses in real-time.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Test streaming functionality",
+            "description": "Conduct tests to ensure streaming responses are displayed correctly and in real-time.",
+            "status": "pending",
+            "dependencies": [],
+            "details": "",
+            "testStrategy": ""
+          }
+        ]
       },
       {
         "id": 5,
@@ -107,7 +135,7 @@
         "dependencies": [
           1
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": []
       },
       {
@@ -172,13 +200,13 @@
         "dependencies": [
           9
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-08-01T14:46:35.542Z",
-      "updated": "2025-08-01T22:12:31.076Z",
+      "updated": "2025-08-01T23:14:12.371Z",
       "description": "Tasks for master context"
     }
   }

@@ -22,7 +22,11 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${supabaseAnonKey}`,
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        message: body.message,
+        mode: body.mode,
+        sessionId: body.sessionId || null
+      }),
     })
 
     const data = await response.json()

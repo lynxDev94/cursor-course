@@ -19,6 +19,7 @@ export default function ChatDemoPage() {
   const [mode, setMode] = useState<ChatMode>('text');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   // Handler functions
   const handleSendMessage = async () => {
@@ -38,12 +39,6 @@ export default function ChatDemoPage() {
     setError(null);
     
     try {
-      // Prepare conversation history for context
-      const conversationHistory = messages.map(msg => ({
-        role: msg.role,
-        content: msg.content
-      }));
-
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -52,7 +47,7 @@ export default function ChatDemoPage() {
         body: JSON.stringify({
           message: newMessage.content,
           mode: newMessage.type,
-          conversationHistory
+          sessionId: sessionId // Send current session ID or null for new session
         }),
       });
 
@@ -62,6 +57,11 @@ export default function ChatDemoPage() {
       }
 
       const data = await response.json();
+      
+      // Update session ID if this is a new session
+      if (!sessionId && data.sessionId) {
+        setSessionId(data.sessionId);
+      }
       
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
@@ -95,6 +95,7 @@ export default function ChatDemoPage() {
     setInputValue('');
     setIsLoading(false);
     setError(null);
+    setSessionId(null); // Reset session ID for new chat
   };
 
   const handleModeToggle = () => {
@@ -115,12 +116,19 @@ export default function ChatDemoPage() {
       <header className="bg-white border-b border-gray-200 px-4 py-3">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <h1 className="text-xl font-semibold text-gray-900">AI Chatbot</h1>
-          <button
-            onClick={handleNewChat}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            New Chat
-          </button>
+          <div className="flex items-center space-x-3">
+            {sessionId && (
+              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                Session: {sessionId.slice(0, 8)}...
+              </span>
+            )}
+            <button
+              onClick={handleNewChat}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              New Chat
+            </button>
+          </div>
         </div>
       </header>
 
@@ -181,6 +189,9 @@ export default function ChatDemoPage() {
                   ? 'Ask me anything and I\'ll respond in real-time.'
                   : 'Describe an image you\'d like me to generate.'
                 }
+              </p>
+              <p className="text-xs mt-1 text-gray-400">
+                Your conversation will be automatically saved.
               </p>
             </div>
           ) : (

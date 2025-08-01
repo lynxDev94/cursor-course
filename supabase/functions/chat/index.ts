@@ -6,11 +6,22 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts"
 import OpenAI from 'https://deno.land/x/openai@v4.24.0/mod.ts'
 import { corsHeaders } from '../_lib/cors.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 interface ChatRequest {
   message: string
   mode: 'text' | 'image'
+  sessionId?: string
   conversationHistory?: Array<{
+    role: 'user' | 'assistant'
+    content: string
+  }>
+}
+
+interface ChatResponse {
+  response: string
+  sessionId: string
+  conversationHistory: Array<{
     role: 'user' | 'assistant'
     content: string
   }>
@@ -25,7 +36,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { message, mode, conversationHistory = [] }: ChatRequest = await req.json()
+    const { message, mode, sessionId, conversationHistory = [] }: ChatRequest = await req.json()
     
     // Validate input
     if (!message || !message.trim()) {
@@ -59,6 +70,48 @@ Deno.serve(async (req) => {
       )
     }
 
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+      return new Response(
+        JSON.stringify({ error: 'Supabase configuration missing' }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
+    // Generate or use existing session ID
+    const currentSessionId = sessionId || crypto.randomUUID()
+
+    // Get conversation history from database if no sessionId provided
+    let dbConversationHistory = conversationHistory
+    if (!sessionId) {
+      // For new sessions, start with empty history
+      dbConversationHistory = []
+    } else {
+      // Get existing conversation history from database
+      const { data: messages, error: historyError } = await supabase
+        .from('chat_messages')
+        .select('role, content')
+        .eq('session_id', sessionId)
+        .order('created_at', { ascending: true })
+        .limit(8) // Keep last 8 messages for context
+
+      if (historyError) {
+        console.error('Error fetching conversation history:', historyError)
+        // Continue with empty history if there's an error
+        dbConversationHistory = []
+      } else {
+        dbConversationHistory = messages || []
+      }
+    }
+
     const apiKey = Deno.env.get('OPENAI_API_KEY')
     if (!apiKey) {
       return new Response(
@@ -75,7 +128,7 @@ Deno.serve(async (req) => {
     })
 
     // Build conversation context (keep last 8 messages)
-    const recentHistory = conversationHistory.slice(-8)
+    const recentHistory = dbConversationHistory.slice(-8)
     const messages = [
       ...recentHistory,
       { role: 'user' as const, content: message }
@@ -92,15 +145,49 @@ Deno.serve(async (req) => {
 
     const reply = chatCompletion.choices[0].message.content
 
+    // Save user message to database
+    const { error: userMessageError } = await supabase
+      .from('chat_messages')
+      .insert({
+        session_id: currentSessionId,
+        role: 'user',
+        content: message,
+        message_type: mode
+      })
+
+    if (userMessageError) {
+      console.error('Error saving user message:', userMessageError)
+    }
+
+    // Save assistant response to database
+    const { error: assistantMessageError } = await supabase
+      .from('chat_messages')
+      .insert({
+        session_id: currentSessionId,
+        role: 'assistant',
+        content: reply,
+        message_type: mode
+      })
+
+    if (assistantMessageError) {
+      console.error('Error saving assistant message:', assistantMessageError)
+    }
+
+    // Build updated conversation history
+    const updatedHistory = [
+      ...recentHistory,
+      { role: 'user', content: message },
+      { role: 'assistant', content: reply }
+    ]
+
+    const response: ChatResponse = {
+      response: reply,
+      sessionId: currentSessionId,
+      conversationHistory: updatedHistory
+    }
+
     return new Response(
-      JSON.stringify({ 
-        response: reply,
-        conversationHistory: [
-          ...recentHistory,
-          { role: 'user', content: message },
-          { role: 'assistant', content: reply }
-        ]
-      }),
+      JSON.stringify(response),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }

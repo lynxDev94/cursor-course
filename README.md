@@ -85,3 +85,45 @@ npx supabase functions serve --import-map ./supabase/functions/import_map.json
 
 Instructions
 - Rename .env.example to .env in `supabase/functions/.env` and add your OPENAI_API_KEY
+
+## ✅ Your Edge Functions are Running Successfully!
+
+The server is up at `http://127.0.0.1:54321/functions/v1/` and the "Missing authorization header" errors are expected when testing without proper headers.
+
+## 🧪 How to Test Your Function
+
+Your `hello-world` function expects a **POST request** with specific requirements. Here's how to test it:
+
+### Option 1: Using curl (in a new terminal)
+```bash
+<code_block_to_apply_changes_from>
+```
+
+### Option 2: Using a tool like Postman or Insomnia
+- **Method**: POST
+- **URL**: `http://127.0.0.1:54321/functions/v1/hello-world`
+- **Headers**:
+  - `Authorization`: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0`
+  - `Content-Type`: `application/json`
+- **Body** (JSON):
+  ```json
+  {
+    "name": "Functions"
+  }
+  ```
+
+##  Expected Response
+If successful, you should get:
+```json
+{
+  "message": "Hello Functions!"
+}
+```
+
+##  Function Details
+- **Method**: POST only (GET requests will fail)
+- **Authentication**: Requires Bearer token
+- **Body**: JSON with `name` field
+- **CORS**: Enabled for cross-origin requests
+
+The function is working correctly - the errors you see are just from unauthorized requests (like browser GET requests or requests without the proper headers).

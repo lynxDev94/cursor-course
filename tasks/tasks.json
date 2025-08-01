@@ -1,0 +1,185 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Initialize Next.js Project with TypeScript",
+        "description": "Set up the Next.js project using the App Directory structure with TypeScript support.",
+        "details": "Use the Next.js CLI to create a new project with TypeScript. Ensure the App Directory structure is used. Configure TypeScript settings and install necessary dependencies.",
+        "testStrategy": "Verify project setup by running the development server and checking for any TypeScript errors.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Install Next.js CLI",
+            "description": "Install the Next.js CLI tool globally to create a new Next.js project.",
+            "dependencies": [],
+            "details": "Use the command `npm install -g create-next-app` to install the Next.js CLI globally on your system. This will allow you to create new Next.js projects easily.",
+            "status": "done",
+            "testStrategy": "Verify the installation by running `create-next-app --version` to ensure the CLI is installed correctly."
+          },
+          {
+            "id": 2,
+            "title": "Create Next.js Project with TypeScript",
+            "description": "Use the Next.js CLI to create a new project with TypeScript support and the App Directory structure.",
+            "dependencies": [],
+            "details": "Run the command `npx create-next-app@latest my-next-app --typescript --experimental-app` to create a new Next.js project named 'my-next-app' with TypeScript and the App Directory structure enabled.",
+            "status": "done",
+            "testStrategy": "Check the project directory for the presence of TypeScript configuration files such as `tsconfig.json` and ensure the App Directory structure is present."
+          },
+          {
+            "id": 3,
+            "title": "Configure TypeScript Settings",
+            "description": "Adjust TypeScript settings to match project requirements and ensure compatibility with Next.js.",
+            "dependencies": [],
+            "details": "Open the `tsconfig.json` file and review the settings. Ensure that strict mode is enabled by setting `\"strict\": true`. Add any necessary paths or compiler options specific to your project needs.",
+            "status": "done",
+            "testStrategy": "Run `npm run dev` to start the development server and check for any TypeScript errors in the console."
+          },
+          {
+            "id": 4,
+            "title": "Install Necessary Dependencies",
+            "description": "Install additional dependencies required for the project, such as ESLint and Prettier for code quality.",
+            "dependencies": [],
+            "details": "Use the command `npm install eslint prettier` to add ESLint and Prettier to the project. Configure ESLint by creating an `.eslintrc.json` file and Prettier by creating a `.prettierrc` file with your preferred settings.",
+            "status": "done",
+            "testStrategy": "Run `npx eslint .` to check for linting errors and `npx prettier --check .` to ensure code formatting is consistent."
+          },
+          {
+            "id": 5,
+            "title": "Verify Project Setup",
+            "description": "Ensure the Next.js project is set up correctly with TypeScript and all configurations are working as expected.",
+            "dependencies": [],
+            "details": "Start the development server using `npm run dev` and open the application in a web browser. Navigate through the default pages to ensure they render correctly and check the console for any errors.",
+            "status": "done",
+            "testStrategy": "Verify that the application runs without errors and that TypeScript is functioning correctly by intentionally introducing a TypeScript error and confirming it is caught by the compiler."
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Install and Configure TailwindCSS",
+        "description": "Add TailwindCSS to the project for styling purposes.",
+        "details": "Follow the TailwindCSS installation guide for Next.js. Configure the tailwind.config.js file to include necessary paths and settings. Ensure TailwindCSS is working by creating a simple styled component.",
+        "testStrategy": "Check if TailwindCSS styles are applied correctly by inspecting the styled component in the browser.",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Create Basic Chat UI Components",
+        "description": "Develop the initial UI components for the chat interface.",
+        "details": "Design and implement components for the chat input, message display, and conversation thread using Shadcn/ui and TailwindCSS.",
+        "testStrategy": "Ensure components render correctly and are responsive across different devices.",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Integrate OpenAI Streaming API",
+        "description": "Implement the integration with OpenAI's streaming API for real-time text responses.",
+        "details": "Use server-sent events to connect to OpenAI's streaming API. Handle incoming data to display streaming text responses in the chat interface.",
+        "testStrategy": "Test the streaming functionality by sending messages and verifying real-time response display.",
+        "priority": "high",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Setup Supabase Backend",
+        "description": "Configure Supabase for backend services including database and edge functions.",
+        "details": "Install Supabase CLI, set up a local development environment, and configure the database schema for chat messages. Implement edge functions for secure API handling.",
+        "testStrategy": "Verify database connectivity and edge function execution by storing and retrieving test messages.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Implement Message Persistence",
+        "description": "Add functionality to store and retrieve chat messages using Supabase.",
+        "details": "Use Supabase's PostgreSQL database to persist chat messages. Implement API endpoints to handle message storage and retrieval.",
+        "testStrategy": "Test message persistence by sending messages and checking database entries.",
+        "priority": "medium",
+        "dependencies": [
+          5
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Develop Image Generation Feature",
+        "description": "Enable image generation using OpenAI's image generation API.",
+        "details": "Implement a toggle to switch between text and image modes. Use OpenAI's image generation API to create images based on user input.",
+        "testStrategy": "Test image generation by toggling modes and verifying image creation and display.",
+        "priority": "medium",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Enhance User Experience with New Chat Functionality",
+        "description": "Add the ability to start new chat sessions, clearing previous conversations.",
+        "details": "Implement a 'New Chat' button that resets the chat interface and clears stored messages for a fresh start.",
+        "testStrategy": "Test the new chat functionality by starting a new session and ensuring the interface resets correctly.",
+        "priority": "medium",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Improve UI/UX Design",
+        "description": "Polish the user interface and experience with better styling and responsiveness.",
+        "details": "Enhance message styling, add loading indicators, and ensure the design is responsive using TailwindCSS.",
+        "testStrategy": "Conduct UI testing across different devices and screen sizes to ensure consistency and responsiveness.",
+        "priority": "low",
+        "dependencies": [
+          8
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Implement Error Handling and User Feedback",
+        "description": "Add error handling mechanisms and user feedback for API failures and other issues.",
+        "details": "Implement error handling for API calls and display user-friendly error messages. Use notifications to inform users of any issues.",
+        "testStrategy": "Simulate API failures and verify that appropriate error messages are displayed to the user.",
+        "priority": "medium",
+        "dependencies": [
+          9
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-08-01T14:46:35.542Z",
+      "updated": "2025-08-01T22:12:31.076Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

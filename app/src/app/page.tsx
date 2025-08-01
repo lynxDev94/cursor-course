@@ -18,9 +18,10 @@ export default function ChatDemoPage() {
   const [inputValue, setInputValue] = useState('');
   const [mode, setMode] = useState<ChatMode>('text');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Handler functions
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
     
     const newMessage: Message = {
@@ -34,29 +35,71 @@ export default function ChatDemoPage() {
     setMessages(prev => [...prev, newMessage]);
     setInputValue('');
     setIsLoading(true);
+    setError(null);
     
-    // TODO: Add API call here in Phase 2
-    setTimeout(() => {
+    try {
+      // Prepare conversation history for context
+      const conversationHistory = messages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: newMessage.content,
+          mode: newMessage.type,
+          conversationHistory
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to get response');
+      }
+
+      const data = await response.json();
+      
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: `This is a placeholder response for: "${newMessage.content}"`,
+        content: data.response,
         type: mode,
         timestamp: new Date(),
       };
+      
       setMessages(prev => [...prev, aiResponse]);
+    } catch (err) {
+      console.error('Chat error:', err);
+      setError(err instanceof Error ? err.message : 'An error occurred');
+      
+      // Add error message to chat
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: `Error: ${err instanceof Error ? err.message : 'An error occurred'}`,
+        type: 'text',
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const handleNewChat = () => {
     setMessages([]);
     setInputValue('');
     setIsLoading(false);
+    setError(null);
   };
 
   const handleModeToggle = () => {
     setMode(prev => prev === 'text' ? 'image' : 'text');
+    setError(null);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -112,6 +155,22 @@ export default function ChatDemoPage() {
           </div>
         </div>
 
+        {/* Error Display */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 px-4 py-3">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-red-800">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.length === 0 ? (
@@ -134,6 +193,8 @@ export default function ChatDemoPage() {
                   className={`max-w-[80%] px-4 py-2 rounded-lg ${
                     message.role === 'user'
                       ? 'bg-blue-600 text-white'
+                      : message.content.startsWith('Error:')
+                      ? 'bg-red-100 border border-red-200 text-red-800'
                       : 'bg-white border border-gray-200 text-gray-900'
                   }`}
                 >

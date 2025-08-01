@@ -13,8 +13,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Chat App",
-  description: "A modern chat application built with Next.js, Supabase, and AI",
+  title: "AI Chatbot - GPT-Powered Conversations",
+  description: "A modern, responsive chatbot interface for interacting with GPT models. Features real-time streaming, image generation, and a clean user experience.",
+  keywords: ["chatbot", "AI", "GPT", "conversation", "streaming", "image generation"],
+  viewport: "width=device-width, initial-scale=1",
 };
 
 export default function RootLayout({
@@ -25,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-background text-foreground`}
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-background text-foreground antialiased`}
       >
         {children}
       </body>
